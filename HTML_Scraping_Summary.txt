@@ -1,0 +1,25 @@
+HTML scraping summary
+
+http://docs.python-guide.org/en/latest/scenarios/scrape/
+
+from lxml import html
+import requests
+from bs4 import BeautifulSoup
+
+page=requests.get('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+
+#look HTML first using BeautifulSoup
+soup=BeautifulSoup(page.content)
+print(soup)
+
+#grab infromation you need using xpath
+tree=html.fromstring(page.text)
+table=tree.xpath('//table')[0]
+symbols_list=table.xpath('.//tr')[1:]  #skip the header
+symbols=[]
+for symbol in symbols_list:
+	tds=symbol.getchildren()
+	sd={'ticker':tds[0].getchildren()[0].text,
+		'name':tds[1].getchildren()[0].text,
+		'sector':tds[3].text}
+	symbols.append((sd['ticker'],sd['name'],sd['sector'])
